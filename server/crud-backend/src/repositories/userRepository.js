@@ -1,8 +1,6 @@
 const User = require('../models/userModel')
 
-async function getAllUsers(){
-          return User.find()
-}
+
 
 async function createUser(username,email,password){
           const newUser = new User({username,email,password})
@@ -22,5 +20,5 @@ async function findExistingUser(email){
           }
 }
 module.exports = {
-          getAllUsers,createUser,findExistingUser,authUser
+         createUser,findExistingUser,authUser
 }

@@ -1,0 +1,18 @@
+.scrollPosts{
+          margin-top: 6rem;
+}
+
+.userWelcome{
+       justify-content: center;
+       margin: 5rem;
+}
+.scrollPosts::-webkit-scrollbar {
+          display: none;
+
+        }
+
+
+        .modal-blur {
+          backdrop-filter: blur(8px);
+        }
+        

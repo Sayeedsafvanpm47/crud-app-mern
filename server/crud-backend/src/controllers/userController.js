@@ -3,19 +3,11 @@ const userService = require('../services/userService')
 const generateToken = require('../utils/generateToken')
 
 
+// getAllUsers Route
 
-async function getAllUsers(req,res){
-          try {
-                  const users = await userService.getAllUsers()
-                 
-                  
-                  res.json(users) 
-          } catch (error) {
-                    console.error(error);
-                    res.status(500).json({ error: 'Internal Server Error' });
-          }
-}
 
+
+// createUser Route
 async function createUser(req,res){
           try {
 
@@ -30,7 +22,8 @@ async function createUser(req,res){
                         res.status(201).json({
                               _id:newUser._id,
                               email:newUser.email,
-                              username:newUser.username
+                              username:newUser.username,
+                              role:newUser.role 
                         })
 
                   }else{
@@ -45,6 +38,7 @@ async function createUser(req,res){
           }
 }
 
+// authUser Route
 async function authUser(req,res){
       try {
             const {email,password} = req.body 
@@ -54,7 +48,8 @@ async function authUser(req,res){
                   res.status(201).json({
                         _id:user._id,
                         email:user.email,
-                        username:user.username
+                        username:user.username,
+                        role:user.role 
                   })
             
             }
@@ -68,13 +63,41 @@ async function authUser(req,res){
       }
 }
 
+// userProfile Route
 async function userProfile(req,res){
       try {
-            res.status(200).json({message:'welcome user'})
+            console.log(req.user)
+            console.log(req.user.email)
+            res.status(200).json(req.user)
             
       } catch (error) {
             console.log(error)
             res.status(500).json({error:'Internal server error!'})
+      }
+}
+
+//updateProfile Route 
+
+async function updateProfile(req,res){
+      try {
+            const user = req.user
+           if(user){
+            user.username = req.body.username || user.username;
+            user.email = req.body.email || user.email;
+            if(req.body.password){
+                  user.password = req.body.password
+            }
+           const updatedUser =  await user.save()
+           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email})
+           }
+           else
+           {
+            res.status(400).json({error:'User not found'})
+           }
+           
+      } catch (error) {
+            console.log(error)
+            res.status(500).json({error:'Internal server error'})
       }
 }
 
@@ -86,10 +109,11 @@ async function logoutUser(req,res){
             })
             res.status(200).json({message:'user logged out'})
       } catch (error) {
+            console.log(error)
             res.status(500).json({error:'Internal server error'})
       }
 }
 
 module.exports = {
-          getAllUsers,createUser,authUser,logoutUser,userProfile
+         createUser,authUser,logoutUser,userProfile,updateProfile
 }

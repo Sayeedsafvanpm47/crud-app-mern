@@ -5,7 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index"
+    "start": "node server/crud-backend/index.js",
+    "server" : "nodemon server/crud-backend/index.js",
+    "client": "cd ../../client/crud-app && npx vite",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+
+    
+   
+
   },
   "keywords": [],
   "author": "",

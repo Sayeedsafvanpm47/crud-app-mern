@@ -1,16 +1,34 @@
-
 import './App.css'
-import { Register } from './components/Register'
 
+import { ToastContainer } from 'react-toastify';
+
+import { Routes, Route } from 'react-router-dom';
+import Home from './components/Home';
+import LoginScreen from './Screens/LoginScreen';
+import RegisterScreen from './Screens/RegisterScreen';
+import Header from './components/Header';
+import ProfileScreen from './Screens/ProfileScreen';
 
 function App() {
- 
-
   return (
     <>
-     <Register/>
+    <div>
+      <Header/>
+    <ToastContainer />
+    </div>
+      <Routes>
+        <Route path="/" element={<Home/>}/>
+          <Route path="/login" element={<LoginScreen/>} />
+          <Route path='/register' element={<RegisterScreen/>}/>
+          <Route path='/profile' element={<ProfileScreen/>}/>
+          
+     
+      </Routes>
+
+ 
+ 
     </>
-  )
+  );
 }
 
-export default App
+export default App;
