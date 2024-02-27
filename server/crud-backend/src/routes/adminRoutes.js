@@ -3,6 +3,8 @@ const adminController = require('../controllers/adminController')
 const {protect} = require('../middleware/authMiddleware')
 const router = express.Router()
 
-router.get('/',adminController.getAllUsers)
+router.get('/home',protect,adminController.getAllUsers)
+router.get('/search',protect,adminController.searchResults)
+router.patch('/update',protect,adminController.updateUser)
 
 module.exports = router 

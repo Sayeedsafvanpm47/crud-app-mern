@@ -1,7 +1,7 @@
 import {createApi,fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 
 const baseQuery = fetchBaseQuery({
-          baseUrl : 'http://localhost:3000/'  //initiating to empty string since i have set up the proxy 
+          baseUrl : ''  //initiating to empty string since i have set up the proxy 
 })
 export const apiSlice = createApi({
           baseQuery,

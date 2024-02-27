@@ -1,6 +1,6 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../app/slices/userApiSlice";
 import { logout } from "../app/slices/authSlice";
 import Container from "react-bootstrap/Container";
@@ -8,36 +8,43 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import Modal from 'react-bootstrap/Modal';
-
+import Modal from "react-bootstrap/Modal";
+import { FormControl, FormLabel, Heading, Input } from "@chakra-ui/react";
 import "../components/Home/Home.css";
-import { useGetUsersQuery } from "../app/slices/adminApiSlice";
+import {
+  useGetUsersQuery,
+  useUpdateUserMutation,
+} from "../app/slices/adminApiSlice";
 import Avatar from "react-avatar";
+import { setUsersList } from "../app/slices/usersResultSlice";
 
 
 const AdminHomeComp = () => {
-const [show,setShow] = useState(false)
-const [userDetail,setUserDetail] = useState({})
-const handleClose = ()=> setShow(false)
-const handleShow = (users)=>{
-          
-          setUserDetail(users)
-          
-          setShow(true)
-}
+  const navigate = useNavigate()
+  const [show, setShow] = useState(false);
+  const location = useLocation()
 
-useEffect(() => {
-          console.log('userdetail', userDetail);
-        }, [userDetail]);
+  const { userData } = useSelector((state) => state.search);
+  console.log("userData", userData);
+  const [userDetail, setUserDetail] = useState({});
+  const handleClose = () => setShow(false);
+  const handleShow = (users) => {
+    setUserDetail(users);
+    setShow(true);
+  };
+
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const [logoutApiCall] = useLogoutMutation();
 
-  const { data, isLoading } = useGetUsersQuery();
-  
+  const [updateUser] = useUpdateUserMutation();
 
-  console.log(data);
+  const { data, refetch } = useGetUsersQuery();
+
+  useEffect(() => {
+    data && dispatch(setUsersList([...data]));
+  }, [userDetail, data]);
 
   const logoutHandler = async () => {
     try {
@@ -49,108 +56,173 @@ useEffect(() => {
       console.log(error);
     }
   };
-  return (
-          <div>
-            <Container>
-              <Row className="d-flex userWelcomeRow">
-                <Col className="d-flex userWelcome">
-                  <p className="mt-3">
-                    {" "}
-                    Hello Welcome {userInfo ? "admin" + userInfo.username : "user"} to
-                    home
-                    <br />
-                    <a onClick={logoutHandler}>
-                      {" "}
-                      {userInfo ? "Logout" : "login to continue"}
-                    </a>
-                  </p>{" "}
-                </Col>
-              </Row>
 
-              <Row>
-                <Col>
-                  {show && (
-                    <div
-                      className="modal show"
-                      style={{ display: "block", position: "initial" }}
-                    >
-                      <Modal.Dialog className="modal-dialog-centered">
-                        <Modal.Header onClick={handleClose} closeButton>
-                          <Modal.Title>Edit User Detail</Modal.Title>
-                        </Modal.Header>
-       
-                        <Modal.Body>
-                          <input type="text" value={userDetail.name} onChange={(e) =>
-    setUserDetail((prevUserDetail) => ({
-      ...prevUserDetail,
-      name: e.target.value,
-    }))
-  }/>
-                          <br />
-                          <input type="text" value={userDetail.email} onChange={(e) =>
-    setUserDetail((prevUserDetail) => ({
-      ...prevUserDetail,
-      email: e.target.value,
-    }))}/>
-                        </Modal.Body>
-      
-                        <Modal.Footer>
-                          <Button variant="secondary" onClick={handleClose}>
-                            Close
-                          </Button>
-                          <Button onClick={handleClose} variant="primary">Save changes</Button>
-                        </Modal.Footer>
-                      </Modal.Dialog>
+  const updateUserData = async (userData) => {
+    try {
+      setShow(false);
+
+      const { data: updatedUserData } = await updateUser(userData);
+
+      refetch();
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
+  useEffect(() => {
+ 
+    if (location.state && location.state.registrationSuccess) {
+
+      refetch();
+    }
+  }, [location.state, refetch]);
+
+
+  const navigateToAddProfile = () => {
+    navigate('/addProfile');
+   
+  };
+
+  return (
+    <div>
+     
+     
+      <Container>
+        <Row className="">
+          <Col className="d-flex userWelcome">
+            <p className="mt-3">
+              Hello Welcome {userInfo ? "admin" + userInfo.username : "user"} to
+              home
+              <br />
+              <a onClick={logoutHandler}>
+                {userInfo ? "Logout" : "login to continue"}
+              </a>
+            </p>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            {show && (
+              <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+              >
+                <Modal.Header onClick={handleClose} closeButton>
+                  <Modal.Title>Edit User Detail</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <FormControl>
+                    <FormLabel>Username</FormLabel>
+                    <div className="">
+                      <Input
+                        className="w-100 mb-3"
+                        type="text"
+                        value={userDetail.name}
+                        onChange={(e) =>
+                          setUserDetail({ ...userDetail, name: e.target.value })
+                        }
+                      />
+                      <FormLabel>Email</FormLabel>
+                      <Input
+                        readOnly
+                        className="w-100"
+                        type="email"
+                        value={userDetail.email}
+                      />
                     </div>
-                  )}
-                </Col>
-              </Row>
-             
-              <Row>
-                <Col
-                  className="d-flex"
-                  style={{ overflowX: "auto", marginRight: "20px" }}
+                  </FormControl>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button
+                    onClick={() => updateUserData(userDetail)}
+                    variant="primary"
+                  >
+                    Save changes
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            )}
+          </Col>
+        </Row>
+
+       
+
+        <Row className="align-items-center">
+          <Heading>User Profiles - <Button onClick={navigateToAddProfile}>Add new Profile</Button></Heading>
+          {userData &&
+            userData.map((users) => (
+              <Card
+                key={users.email}
+                style={{
+                  width: "25rem",
+                  marginRight: "20px",
+                  width: "18rem",
+                  marginBottom: "2rem",
+                  maxHeight: "30rem",
+                  height: "15rem",
+                }}
+              >
+                <Card.Header
+                  key={users.email}
+                  style={{
+                    alignContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
-                  {data &&
-                    data.map((users) => (
-                      <Card style={{ width: "18rem", marginRight: "20px" }}>
-                        <Card.Header
-                          style={{
-                            alignContent: "center",
-                            display: "flex",
-                            alignItems: "center",
-                          }}
-                        >
-                          {" "}
-                          <Avatar name={users.username} size="50" round={true} />{" "}
-                        </Card.Header>
-      
-                        <Card.Body>
-                          <Card.Title>{users.username}</Card.Title>
-                          <Card.Text>
-                            {users.email}
-                            <br />
-                            Joined on: {new Date(users.createdAt).toDateString()}
-                          </Card.Text>
-                        </Card.Body>
-                        <Card.Footer>
-                          {" "}
-                          <Button onClick={()=>{
-                              const user = {id:users.id,name:users.username,email:users.email}
-                              handleShow(user)
-                              console.log(users)
-                          }} variant="primary">
-                            Edit User
-                          </Button>
-                        </Card.Footer>
-                      </Card>
-                      
-                    ))}
-                </Col>
-              </Row>
-            </Container>
-          </div>
-        );
+                  <Avatar name={users.username} size="50" round={true} />
+                </Card.Header>
+                <Card.Body>
+                  <Card.Title>{users.username}</Card.Title>
+                  <Card.Text>
+                    {users.email}
+                    <br />
+                    Joined on: {new Date(users.createdAt).toDateString()}
+                  </Card.Text>
+                </Card.Body>
+                <Card.Footer>
+                  <Button
+                    onClick={() => {
+                      const user = {
+                        id: users.id,
+                        name: users.username,
+                        email: users.email,
+                      };
+                      handleShow(user);
+                      console.log(users);
+                    }}
+                    variant="info"
+                    className="me-3"
+                  >
+                    Edit User
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const user = users._id;
+                      // deleteUser(user)
+                      console.log(user);
+                    }}
+                    variant="danger"
+                  >
+                    Delete User
+                  </Button>
+                </Card.Footer>
+              </Card>
+            ))}
+          {!userData.length && <p>No users info available</p>}
+        </Row>
+      </Container>
+    </div>
+  );
 };
 
 export default AdminHomeComp;

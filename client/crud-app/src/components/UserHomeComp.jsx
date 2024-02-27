@@ -39,7 +39,8 @@ const UserHomeComp = () => {
            <br />
          <a onClick={logoutHandler}> {userInfo?'Logout': 'login to continue'}</a></p>  </Col>
         </Row>
-        <Row>
+
+      {userInfo &&  <Row>
           <Col className='d-flex scrollPosts' style={{ overflowX: 'auto' }}>
           <PostCard/>
           <PostCard/>
@@ -51,7 +52,7 @@ const UserHomeComp = () => {
           <PostCard/>
           <PostCard/>
           </Col>
-        </Row>
+        </Row>}
      
          
       </Container>

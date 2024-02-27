@@ -12,4 +12,31 @@ async function getAllUsers(req,res){
           }
 }
 
-module.exports = {getAllUsers}
+async function searchResults(req,res){
+        try {
+                const users = await userService.searchResults(req)
+                res.json(users)
+        } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+        }
+}
+
+async function updateUser(req,res){
+        try {
+                console.log(req.body)
+                const {email,name} = req.body 
+                console.log(email,name)
+                const user = await userService.updateUser(email,name)
+                console.log('update complete')
+                res.status(200).json(user);
+                
+        } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+        }
+}
+
+
+
+module.exports = {getAllUsers,searchResults,updateUser}

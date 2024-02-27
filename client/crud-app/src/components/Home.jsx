@@ -20,7 +20,7 @@ const Home = () => {
     <div>
       
       <Container>
-       { userInfo.role === 'admin' ? (<div><AdminHomeComp/></div>) : (<div><UserHomeComp/></div>)}
+       { userInfo && userInfo.role === 'admin' ? (<div><AdminHomeComp/></div>) : (<div><UserHomeComp/></div>)}
     
       </Container>
     

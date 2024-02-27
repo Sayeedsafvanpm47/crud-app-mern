@@ -6,19 +6,16 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server/crud-backend/index.js",
-    "server" : "nodemon server/crud-backend/index.js",
+    "server": "nodemon server/crud-backend/index.js",
     "client": "cd ../../client/crud-app && npx vite",
     "dev": "concurrently \"npm run server\" \"npm run client\""
-
-    
-   
-
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.0.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -28,5 +25,8 @@
     "mongodb": "^6.3.0",
     "mongoose": "^8.2.0",
     "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

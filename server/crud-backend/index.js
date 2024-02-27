@@ -5,6 +5,7 @@ const app = express()
 const cookieParser =  require('cookie-parser')
 const userRoutes = require('./src/routes/userRoutes')
 const adminRoutes = require('./src/routes/adminRoutes')
+
 let db = require('./src/connection/database')
 const corsOptions = {
   origin: 'http://localhost:5000',
@@ -19,7 +20,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
 
 
-        
+  
 app.use('/api',userRoutes)
 app.use('/api/admin',adminRoutes)
  

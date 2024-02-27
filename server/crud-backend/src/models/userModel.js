@@ -24,6 +24,15 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    firstname : {
+      type : String
+    },
+    lastname : {
+      type : String 
+    },
+    profilePic : {
+      type : String 
+    }
   },
   
   { collection: 'Users', timestamps: true }

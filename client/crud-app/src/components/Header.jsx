@@ -2,11 +2,37 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'react-avatar'
 import { useNavigate } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import { useState } from 'react';
+import { useSearchUsersQuery } from '../app/slices/adminApiSlice';
+import { setUsersList } from '../app/slices/usersResultSlice';
 
 const Header = () => {
+         
+          const [searchText,setSearchText] = useState('')
+          const {data} = useSearchUsersQuery(searchText)
+          const dispatch = useDispatch()
+          console.log('search',data)
+          const handleSearchChange = async (e) => {
+            const newSearchText = e.target.value;
+            setSearchText(newSearchText);
+        
+       
+            dispatch(setUsersList([...data]));
+          };
+        
+          const handleSearch = async (e)=>{
+           e.preventDefault()
+          setSearchText(searchText)
+        
+
+          dispatch(setUsersList([...data]));           
+
+          }
           const navigate = useNavigate()
           const viewProfile = ()=>{
                    navigate('/profile') 
@@ -36,6 +62,19 @@ const Header = () => {
           </Nav>
         </Navbar.Collapse>
       </Container>
+     {userInfo && userInfo.role === 'admin' && <Form className="d-flex w-100 me-3"  onSubmit={(e) => { e.preventDefault(); handleSearch(e); }}>
+                  <Form.Control 
+                    type="search"
+                    placeholder="Search"
+                    className="me-2 w-100" 
+                    aria-label="Search"
+                    value={searchText}
+                    onChange={handleSearchChange}
+                    
+                    
+                  />
+                  <Button variant="outline-success" onClick={handleSearch}>Search</Button>
+                </Form> }
       <div className='me-5'>    {userInfo?( <Avatar name={userInfo.username} size="50" round={true} />):(<Avatar name="User" size="50" round={true} />)}</div>
   
     </Navbar>

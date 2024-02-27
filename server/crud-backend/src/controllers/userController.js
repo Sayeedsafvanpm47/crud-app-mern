@@ -84,11 +84,14 @@ async function updateProfile(req,res){
            if(user){
             user.username = req.body.username || user.username;
             user.email = req.body.email || user.email;
+            user.profilePic = req.body.profilePic || ''
+            user.firstname = req.body.firstname || ''
+            user.lastname = req.body.lastname || ''
             if(req.body.password){
                   user.password = req.body.password
             }
            const updatedUser =  await user.save()
-           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email})
+           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email,profilePic:updatedUser.profilePic,firstname:updatedUser.firstname,lastname:updatedUser.lastname})
            }
            else
            {
