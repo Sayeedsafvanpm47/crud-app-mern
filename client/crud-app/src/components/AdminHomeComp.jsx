@@ -9,14 +9,17 @@ import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Modal from "react-bootstrap/Modal";
+import Swal from 'sweetalert2'
 import { FormControl, FormLabel, Heading, Input } from "@chakra-ui/react";
 import "../components/Home/Home.css";
 import {
+  useDeleteUserMutation,
   useGetUsersQuery,
   useUpdateUserMutation,
 } from "../app/slices/adminApiSlice";
 import Avatar from "react-avatar";
 import { setUsersList } from "../app/slices/usersResultSlice";
+import { showToastSuccess } from "../services/toastServices";
 
 
 const AdminHomeComp = () => {
@@ -40,6 +43,8 @@ const AdminHomeComp = () => {
 
   const [updateUser] = useUpdateUserMutation();
 
+  const [deleteUser] = useDeleteUserMutation()
+
   const { data, refetch } = useGetUsersQuery();
 
   useEffect(() => {
@@ -48,20 +53,42 @@ const AdminHomeComp = () => {
 
   const logoutHandler = async () => {
     try {
-      await logoutApiCall().unwrap();
-      dispatch(logout());
-      alert("logout success");
-      navigate("/login", { replace: true });
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You are going to logout",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Logout"
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Logout",
+            text: "Logout success",
+            icon: "success"
+          });
+          await logoutApiCall().unwrap();
+          dispatch(logout());
+        
+          navigate("/login", { replace: true });
+        }
+      });
+   
     } catch (error) {
       console.log(error);
     }
   };
-
+  const deleteUserApi = async (_id)=>{
+   await deleteUser({_id:_id})
+   showToastSuccess('User deleted successfully')
+   refetch()
+  }
   const updateUserData = async (userData) => {
     try {
       setShow(false);
-
-      const { data: updatedUserData } = await updateUser(userData);
+    showToastSuccess('User edited succesfully')
+     await updateUser(userData);
 
       refetch();
     } catch (error) {
@@ -72,7 +99,7 @@ const AdminHomeComp = () => {
   useEffect(() => {
  
     if (location.state && location.state.registrationSuccess) {
-
+ 
       refetch();
     }
   }, [location.state, refetch]);
@@ -135,6 +162,24 @@ const AdminHomeComp = () => {
                         type="email"
                         value={userDetail.email}
                       />
+                        <FormLabel>Firstname</FormLabel>
+                      <Input
+                        
+                        className="w-100"
+                        type="firstname"
+                        value={userDetail.firstname}
+                        onChange={(e) =>
+                          setUserDetail({ ...userDetail, firstname: e.target.value })}
+                      />
+                        <FormLabel>Lastname</FormLabel>
+                      <Input
+                        
+                        className="w-100"
+                        type="lastname"
+                        value={userDetail.lastname}
+                        onChange={(e) =>
+                          setUserDetail({ ...userDetail, lastname: e.target.value })}
+                      />
                     </div>
                   </FormControl>
                 </Modal.Body>
@@ -179,7 +224,7 @@ const AdminHomeComp = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Avatar name={users.username} size="50" round={true} />
+                  {users && users.profilePic ? (<Avatar style={{border:'1px solid'}} src={`https://res.cloudinary.com/dkxyzzuss/image/upload/${users.profilePic}`} name={users.username} size="50" round={true} />) : (<Avatar style={{border:'1px solid'}} name={users.username} size="50" round={true} />)}
                 </Card.Header>
                 <Card.Body>
                   <Card.Title>{users.username}</Card.Title>
@@ -196,6 +241,8 @@ const AdminHomeComp = () => {
                         id: users.id,
                         name: users.username,
                         email: users.email,
+                        firstname : users.firstname || '',
+                        lastname : users.lastname || ''
                       };
                       handleShow(user);
                       console.log(users);
@@ -207,8 +254,8 @@ const AdminHomeComp = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      const user = users._id;
-                      // deleteUser(user)
+                      const _id = users._id;
+                      deleteUserApi(_id)
                       console.log(user);
                     }}
                     variant="danger"

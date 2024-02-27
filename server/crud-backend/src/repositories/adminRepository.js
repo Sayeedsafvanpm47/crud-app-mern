@@ -14,11 +14,16 @@ const results = await User.find({
           return results 
 }
 
-async function updateUser(email,name){
-const updatedUser = await User.findOneAndUpdate({email:email},{$set:{username:name}},{new:true})
+async function updateUser(email,name,firstname,lastname){
+const updatedUser = await User.findOneAndUpdate({email:email},{$set:{username:name,firstname:firstname,lastname:lastname}},{new:true})
 return updatedUser
 }
 
+async function deleteUser(_id){
+  await User.deleteOne({_id:_id})
+  return res.status(200).json({message:'Deleted successfully :)'})
+}
+
 module.exports = {
-          getAllUsers,searchResults,updateUser
+          getAllUsers,searchResults,updateUser,deleteUser
 }

@@ -25,9 +25,9 @@ async function searchResults(req,res){
 async function updateUser(req,res){
         try {
                 console.log(req.body)
-                const {email,name} = req.body 
+                const {email,name,firstname,lastname} = req.body 
                 console.log(email,name)
-                const user = await userService.updateUser(email,name)
+                const user = await userService.updateUser(email,name,firstname,lastname)
                 console.log('update complete')
                 res.status(200).json(user);
                 
@@ -37,6 +37,16 @@ async function updateUser(req,res){
         }
 }
 
+async function deleteUser(req,res){
+        try {
+                const {_id} = req.body 
+                await userService.deleteUser(_id)
+                res.status(200).json({message:'user deleted succesfully'});
+        } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+        }
+}
 
 
-module.exports = {getAllUsers,searchResults,updateUser}
+module.exports = {getAllUsers,searchResults,updateUser,deleteUser}
