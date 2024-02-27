@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express')
 const cors =  require('cors')      
 const app = express()
+
 const cookieParser =  require('cookie-parser')
 const userRoutes = require('./src/routes/userRoutes')
 const adminRoutes = require('./src/routes/adminRoutes')
@@ -16,7 +17,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json())
 
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({limit:'50mb',extended:true}))
 app.use(cookieParser())
 
 

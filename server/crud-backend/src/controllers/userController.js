@@ -1,6 +1,7 @@
 
 const userService = require('../services/userService')
 const generateToken = require('../utils/generateToken')
+const {cloudinary} = require('../utils/cloudinary')
 
 
 // getAllUsers Route
@@ -23,7 +24,8 @@ async function createUser(req,res){
                               _id:newUser._id,
                               email:newUser.email,
                               username:newUser.username,
-                              role:newUser.role 
+                              role:newUser.role ,
+                              profilePic:newUser.profilePic
                         })
 
                   }else{
@@ -49,7 +51,8 @@ async function authUser(req,res){
                         _id:user._id,
                         email:user.email,
                         username:user.username,
-                        role:user.role 
+                        role:user.role ,
+                        profilePic:user.profilePic
                   })
             
             }
@@ -82,16 +85,22 @@ async function updateProfile(req,res){
       try {
             const user = req.user
            if(user){
+            const pic = req.body.profilePic
+           
+            const uploadedResponse = await cloudinary.uploader.upload(pic,{
+                  upload_preset:'ayem7vrh'
+            })
+            console.log(uploadedResponse.public_id)
             user.username = req.body.username || user.username;
             user.email = req.body.email || user.email;
-            user.profilePic = req.body.profilePic || ''
+           user.profilePic = uploadedResponse.public_id || ''
             user.firstname = req.body.firstname || ''
             user.lastname = req.body.lastname || ''
             if(req.body.password){
                   user.password = req.body.password
             }
            const updatedUser =  await user.save()
-           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email,profilePic:updatedUser.profilePic,firstname:updatedUser.firstname,lastname:updatedUser.lastname})
+           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email,profilePic:uploadedResponse.public_id,firstname:updatedUser.firstname,lastname:updatedUser.lastname})
            }
            else
            {
