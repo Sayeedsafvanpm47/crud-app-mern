@@ -4,12 +4,15 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'react-avatar'
+import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
 import { useSearchUsersQuery } from '../app/slices/adminApiSlice';
 import { setUsersList } from '../app/slices/usersResultSlice';
+import { logout } from '../app/slices/authSlice'
+import { useLogoutMutation } from '../app/slices/userApiSlice'
 
 const Header = () => {
          
@@ -17,6 +20,36 @@ const Header = () => {
           const {data} = useSearchUsersQuery(searchText)
           const dispatch = useDispatch()
           console.log('search',data)
+          const [logoutApiCall] = useLogoutMutation()
+
+ 
+          const logoutHandler = async ()=>{
+            try {
+              Swal.fire({
+                title: "Are you sure?",
+                text: "You are going to logout",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Logout"
+              }).then(async (result) => {
+                if (result.isConfirmed) {
+                  Swal.fire({
+                    title: "Logout",
+                    text: "Logout success",
+                    icon: "success"
+                  });
+                  await logoutApiCall().unwrap();
+                  dispatch(logout());
+                
+                  navigate("/login", { replace: true });
+                }
+              }); } catch (error) {
+                console.log(error);
+              }
+          }
+
           const handleSearchChange = async (e) => {
             const newSearchText = e.target.value;
             setSearchText(newSearchText);
@@ -54,7 +87,7 @@ const Header = () => {
 
            {userInfo ? (<NavDropdown title={userInfo?userInfo.username : ''} id="basic-nav-dropdown">
               <NavDropdown.Item onClick={viewProfile}>Profile</NavDropdown.Item>
-              <NavDropdown.Item>
+              <NavDropdown.Item onClick={logoutHandler}>
                 Logout
               </NavDropdown.Item>
             
@@ -75,7 +108,8 @@ const Header = () => {
                   />
                   <Button variant="outline-success" onClick={handleSearch}>Search</Button>
                 </Form> }
-      <div className='me-5'>    {userInfo?( <Avatar name={userInfo.username} size="50" round={true} />):(<Avatar name="User" size="50" round={true} />)}</div>
+      <div className='me-5'>         {userInfo && userInfo.profilePic ? (<Avatar style={{border:'1px solid'}} src={`https://res.cloudinary.com/dkxyzzuss/image/upload/${userInfo.profilePic}`} name={userInfo.username} size="60" round={true} />) : (<Avatar style={{border:'1px solid'}} name={userInfo ? userInfo.username:'user'} size="60" round={true} />)}
+</div>
   
     </Navbar>
     </div>

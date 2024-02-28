@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useLogoutMutation } from "../app/slices/userApiSlice";
-import { logout } from "../app/slices/authSlice";
+
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Modal from "react-bootstrap/Modal";
-import Swal from 'sweetalert2'
+
 import { FormControl, FormLabel, Heading, Input } from "@chakra-ui/react";
 import "../components/Home/Home.css";
 import {
@@ -39,7 +38,7 @@ const AdminHomeComp = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const [logoutApiCall] = useLogoutMutation();
+
 
   const [updateUser] = useUpdateUserMutation();
 
@@ -51,34 +50,7 @@ const AdminHomeComp = () => {
     data && dispatch(setUsersList([...data]));
   }, [userDetail, data]);
 
-  const logoutHandler = async () => {
-    try {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You are going to logout",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Logout"
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: "Logout",
-            text: "Logout success",
-            icon: "success"
-          });
-          await logoutApiCall().unwrap();
-          dispatch(logout());
-        
-          navigate("/login", { replace: true });
-        }
-      });
-   
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
   const deleteUserApi = async (_id)=>{
    await deleteUser({_id:_id})
    showToastSuccess('User deleted successfully')
@@ -121,8 +93,8 @@ const AdminHomeComp = () => {
               Hello Welcome {userInfo ? "admin" + userInfo.username : "user"} to
               home
               <br />
-              <a onClick={logoutHandler}>
-                {userInfo ? "Logout" : "login to continue"}
+              <a>
+                {!userInfo && "login to continue"}
               </a>
             </p>
           </Col>
