@@ -80,13 +80,13 @@ const Header = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
+            <Nav.Link onClick={()=>navigate('/')}>Home</Nav.Link>
+            
           
            
 
            {userInfo ? (<NavDropdown title={userInfo?userInfo.username : ''} id="basic-nav-dropdown">
-              <NavDropdown.Item onClick={viewProfile}>Profile</NavDropdown.Item>
+            <NavDropdown.Item onClick={viewProfile}>Profile</NavDropdown.Item>
               <NavDropdown.Item onClick={logoutHandler}>
                 Logout
               </NavDropdown.Item>

@@ -19,6 +19,7 @@ import {
 import Avatar from "react-avatar";
 import { setUsersList } from "../app/slices/usersResultSlice";
 import { showToastSuccess } from "../services/toastServices";
+import Hero from "./Hero";
 
 
 const AdminHomeComp = () => {
@@ -88,15 +89,8 @@ const AdminHomeComp = () => {
      
       <Container>
         <Row className="">
-          <Col className="d-flex userWelcome">
-            <p className="mt-3">
-              Hello Welcome {userInfo ? "admin" + userInfo.username : "user"} to
-              home
-              <br />
-              <a>
-                {!userInfo && "login to continue"}
-              </a>
-            </p>
+          <Col className="d-flex userWelcome mt-3">
+           <Hero/>
           </Col>
         </Row>
 
@@ -176,7 +170,7 @@ const AdminHomeComp = () => {
         <Row className="align-items-center">
           <Heading>User Profiles - <Button onClick={navigateToAddProfile}>Add new Profile</Button></Heading>
           {userData &&
-            userData.map((users) => (
+            userData.filter((user) => user.role !== 'admin').map((users) => (
               <Card
                 key={users.email}
                 style={{

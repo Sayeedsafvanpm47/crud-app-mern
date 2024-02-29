@@ -25,7 +25,9 @@ async function createUser(req,res){
                               email:newUser.email,
                               username:newUser.username,
                               role:newUser.role ,
-                              profilePic:newUser.profilePic
+                              profilePic:newUser.profilePic,
+                              firstname : newUser.firstname || '',
+                              lastname : newUser.lastname || ''
                         })
 
                   }else{
@@ -52,7 +54,9 @@ async function authUser(req,res){
                         email:user.email,
                         username:user.username,
                         role:user.role ,
-                        profilePic:user.profilePic
+                        profilePic:user.profilePic,
+                        firstname : user.firstname || '',
+                        lastname : user.lastname || ''
                   })
             
             }
@@ -84,23 +88,28 @@ async function userProfile(req,res){
 async function updateProfile(req,res){
       try {
             const user = req.user
+            let uploadedResponse
            if(user){
             const pic = req.body.profilePic
-           
-            const uploadedResponse = await cloudinary.uploader.upload(pic,{
+           if(pic){
+            uploadedResponse = await cloudinary.uploader.upload(pic,{
                   upload_preset:'ayem7vrh'
             })
+            user.profilePic = uploadedResponse.public_id || '';
+      }
             console.log(uploadedResponse.public_id)
             user.username = req.body.username || user.username;
             user.email = req.body.email || user.email;
-           user.profilePic = uploadedResponse.public_id || ''
+            user.role = req.body.role || 'user'
+      
             user.firstname = req.body.firstname || ''
             user.lastname = req.body.lastname || ''
             if(req.body.password){
                   user.password = req.body.password
             }
+           
            const updatedUser =  await user.save()
-           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email,profilePic:uploadedResponse.public_id,firstname:updatedUser.firstname,lastname:updatedUser.lastname})
+           res.status(200).json({_id:updatedUser._id,username:updatedUser.username,email:updatedUser.email,profilePic:uploadedResponse.public_id,firstname:updatedUser.firstname,lastname:updatedUser.lastname,role:updatedUser.role})
            }
            else
            {
